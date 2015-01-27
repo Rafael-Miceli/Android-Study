@@ -9,20 +9,31 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
+import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
+import com.microsoft.windowsazure.mobileservices.TableJsonOperationCallback;
 
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
+    private final String TAG = "MainActivity";
+
     private Button new_button;
     protected AuthService mAuthService;
+
+    private EditText mTxtUsername;
+    private EditText mTxtPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mTxtUsername = (EditText) findViewById(R.id.editTextLogin);
+        mTxtPassword = (EditText) findViewById(R.id.editTextPassword);
 
         new_button = (Button)findViewById(R.id.button);
         new_button.setOnClickListener(this);
@@ -32,26 +43,26 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     public void onClick(View v) {
         Toast.makeText(this, "Me Clicou", Toast.LENGTH_LONG).show();
 
-//        if (mTxtPassword.getText().toString().equals("") ||
-//                mTxtUsername.getText().toString().equals("")) {
-//            //We're just logging this here, we should show something to the user
-//            Log.w(TAG, "Username or password not entered");
-//            return;
-//        }
-//        mAuthService.login(mTxtUsername.getText().toString(), mTxtPassword.getText().toString(), new TableJsonOperationCallback() {
-//            @Override
-//            public void onCompleted(JsonObject jsonObject, Exception exception,
-//                                    ServiceFilterResponse response) {
-//                if (exception == null) {
-//                    //If they've registered successfully, we'll save and set the userdata and then
-//                    //show the logged in activity
-//                    mAuthService.setUserAndSaveData(jsonObject);
-//                    Intent loggedInIntent = new Intent(getApplicationContext(), LoggedIn.class);
-//                    startActivity(loggedInIntent);
-//                } else {
-//                    Log.e(TAG, "Error loggin in: " + exception.getMessage());
-//                }
-//            }
-//        });
+        if (mTxtPassword.getText().toString().equals("") ||
+                mTxtUsername.getText().toString().equals("")) {
+            //We're just logging this here, we should show something to the user
+            Log.w(TAG, "Username or password not entered");
+            return;
+        }
+        mAuthService.login(mTxtUsername.getText().toString(), mTxtPassword.getText().toString(), new TableJsonOperationCallback() {
+            @Override
+            public void onCompleted(JsonObject jsonObject, Exception exception,
+                                    ServiceFilterResponse response) {
+                if (exception == null) {
+                    //If they've registered successfully, we'll save and set the userdata and then
+                    //show the logged in activity
+                    mAuthService.setUserAndSaveData(jsonObject);
+                    Intent loggedInIntent = new Intent(getApplicationContext(), LoggedIn.class);
+                    startActivity(loggedInIntent);
+                } else {
+                    Log.e(TAG, "Error loggin in: " + exception.getMessage());
+                }
+            }
+        });
     }
 }

@@ -25,17 +25,17 @@ import android.webkit.CookieSyncManager;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.JsonObject;
 
-import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceAuthenticationProvider;
+import com.microsoft.windowsazure.mobileservices.MobileServiceAuthenticationProvider;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
-import com.microsoft.windowsazure.mobileservices.table.MobileServiceJsonTable;
-import com.microsoft.windowsazure.mobileservices.authentication.MobileServiceUser;
-import com.microsoft.windowsazure.mobileservices.http.NextServiceFilterCallback;
-import com.microsoft.windowsazure.mobileservices.http.ServiceFilter;
-import com.microsoft.windowsazure.mobileservices.http.ServiceFilterRequest;
-import com.microsoft.windowsazure.mobileservices.http.ServiceFilterResponse;
+import com.microsoft.windowsazure.mobileservices.MobileServiceJsonTable;
+import com.microsoft.windowsazure.mobileservices.MobileServiceUser;
+import com.microsoft.windowsazure.mobileservices.NextServiceFilterCallback;
+import com.microsoft.windowsazure.mobileservices.ServiceFilter;
+import com.microsoft.windowsazure.mobileservices.ServiceFilterRequest;
+import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponseCallback;
-import com.microsoft.windowsazure.mobileservices.table.TableJsonOperationCallback;
-import com.microsoft.windowsazure.mobileservices.table.TableJsonQueryCallback;
+import com.microsoft.windowsazure.mobileservices.TableJsonOperationCallback;
+import com.microsoft.windowsazure.mobileservices.TableJsonQueryCallback;
 import com.microsoft.windowsazure.mobileservices.UserAuthenticationCallback;
 
 
@@ -235,95 +235,92 @@ public class AuthService {
      */
     private class MyServiceFilter implements ServiceFilter {
 
-        //A versão de exemplo que estou me baseando para realizar o request para login no Azure é uma versão anterior a 2.0 que está em beta.
-        //Preciso descobrir qual versão deste exemplo para utilizar o mobileservice.jar referente a esta versão
-        //Após vejo uma maneira de atualizar o mesmo
+        //A versão do AzureMobileService usada neste App é a 1.1.0
+        //Ao atualizar para nova versão, lembrar que a assinatura da Interface ServiceFilter mudou
 
 
         @Override
-        public ListenableFuture<ServiceFilterResponse> handleRequest(final ServiceFilterRequest request, final NextServiceFilterCallback nextServiceFilterCallback) {
+        public void handleRequest(final ServiceFilterRequest request, final NextServiceFilterCallback nextServiceFilterCallback,
+                                  final ServiceFilterResponseCallback responseCallback) {
 
-            nextServiceFilterCallback.onNext(request);
 
-//                    , new ServiceFilterResponseCallback() {
-//                @Override
-//                public void onResponse(ServiceFilterResponse response, Exception exception) {
-//                    if (exception != null) {
-//                        Log.e(TAG, "MyServiceFilter onResponse Exception: " + exception.getMessage());
-//                    }
-//
-//
-//                    StatusLine status = response.getStatus();
-//                    int statusCode = status.getStatusCode();
-//                    if (statusCode == 401) {
-//                        final CountDownLatch latch = new CountDownLatch(1);
-//                        //Log the user out but don't send them to the login page
-//                        logout(false);
-//                        //If we shouldn't retry (or they've used custom auth),
-//                        //we're going to kick them out for now
-//                        //If you're doing custom auth, you'd need to show your own
-//                        //custom auth popup to login with
-//                        if (mShouldRetryAuth && !mIsCustomAuthProvider) {
-//                            //Get the current activity for the context so we can show the login dialog
-//                            AuthenticationApplication myApp = (AuthenticationApplication) mContext;
-//                            Activity currentActivity = myApp.getCurrentActivity();
-//                            mClient.setContext(currentActivity);
-//
-//                            currentActivity.runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    mClient.login(mProvider, new UserAuthenticationCallback() {
-//                                        @Override
-//                                        public void onCompleted(MobileServiceUser user, Exception exception,
-//                                                                ServiceFilterResponse response) {
-//                                            if (exception == null) {
-//                                                //Save their updated user data locally
-//                                                saveUserData();
-//                                                //Update the requests X-ZUMO-AUTH header
-//                                                request.removeHeader("X-ZUMO-AUTH");
-//                                                request.addHeader("X-ZUMO-AUTH", mClient.getCurrentUser().getAuthenticationToken());
-//
-//                                                //Add our BYPASS querystring parameter to the URL
-//                                                Uri.Builder uriBuilder = Uri.parse(request.getUrl()).buildUpon();
-//                                                uriBuilder.appendQueryParameter("bypass", "true");
-//                                                try {
-//                                                    request.setUrl(uriBuilder.build().toString());
-//                                                } catch (URISyntaxException e) {
-//                                                    Log.e(TAG, "Couldn't set request's new url: " + e.getMessage());
-//                                                    e.printStackTrace();
-//                                                }
-//                                                latch.countDown();
-//
-//                                            } else {
-//                                                Log.e(TAG, "User did not login successfully after 401");
-//                                                //Kick user back to login screen
-//                                                logout(true);
-//                                            }
-//
-//                                        }
-//                                    });
-//                                }
-//                            });
-//                            try {
-//                                latch.await();
-//                            } catch (InterruptedException e) {
-//                                Log.e(TAG, "Interrupted exception: " + e.getMessage());
-//                                return;
-//                            }
-//
-//                            nextServiceFilterCallback.onNext(request);
-//                        } else {
-//                            //Log them out and proceed with the response
-//                            logout(true);
-//                            //responseCallback.onResponse(response, exception);
-//                        }
-//                    } else {
-//
-//                    }
-//                }
-//            });
+            nextServiceFilterCallback.onNext(request, new ServiceFilterResponseCallback() {
+                @Override
+                public void onResponse(ServiceFilterResponse response, Exception exception) {
+                    if (exception != null) {
+                        Log.e(TAG, "MyServiceFilter onResponse Exception: " + exception.getMessage());
+                    }
 
-            return null;
+
+                    StatusLine status = response.getStatus();
+                    int statusCode = status.getStatusCode();
+                    if (statusCode == 401) {
+                        final CountDownLatch latch = new CountDownLatch(1);
+                        //Log the user out but don't send them to the login page
+                        logout(false);
+                        //If we shouldn't retry (or they've used custom auth),
+                        //we're going to kick them out for now
+                        //If you're doing custom auth, you'd need to show your own
+                        //custom auth popup to login with
+                        if (mShouldRetryAuth && !mIsCustomAuthProvider) {
+                            //Get the current activity for the context so we can show the login dialog
+                            AuthenticationApplication myApp = (AuthenticationApplication) mContext;
+                            Activity currentActivity = myApp.getCurrentActivity();
+                            mClient.setContext(currentActivity);
+
+                            currentActivity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mClient.login(mProvider, new UserAuthenticationCallback() {
+                                        @Override
+                                        public void onCompleted(MobileServiceUser user, Exception exception,
+                                                                ServiceFilterResponse response) {
+                                            if (exception == null) {
+                                                //Save their updated user data locally
+                                                saveUserData();
+                                                //Update the requests X-ZUMO-AUTH header
+                                                request.removeHeader("X-ZUMO-AUTH");
+                                                request.addHeader("X-ZUMO-AUTH", mClient.getCurrentUser().getAuthenticationToken());
+
+                                                //Add our BYPASS querystring parameter to the URL
+                                                Uri.Builder uriBuilder = Uri.parse(request.getUrl()).buildUpon();
+                                                uriBuilder.appendQueryParameter("bypass", "true");
+                                                try {
+                                                    request.setUrl(uriBuilder.build().toString());
+                                                } catch (URISyntaxException e) {
+                                                    Log.e(TAG, "Couldn't set request's new url: " + e.getMessage());
+                                                    e.printStackTrace();
+                                                }
+                                                latch.countDown();
+
+                                            } else {
+                                                Log.e(TAG, "User did not login successfully after 401");
+                                                //Kick user back to login screen
+                                                logout(true);
+                                            }
+
+                                        }
+                                    });
+                                }
+                            });
+                            try {
+                                latch.await();
+                            } catch (InterruptedException e) {
+                                Log.e(TAG, "Interrupted exception: " + e.getMessage());
+                                return;
+                            }
+
+                            nextServiceFilterCallback.onNext(request, responseCallback);
+                        } else {
+                            //Log them out and proceed with the response
+                            logout(true);
+                            responseCallback.onResponse(response, exception);
+                        }
+                    } else {//
+                        responseCallback.onResponse(response, exception);
+                    }
+                }
+            });
         }
     }
 
