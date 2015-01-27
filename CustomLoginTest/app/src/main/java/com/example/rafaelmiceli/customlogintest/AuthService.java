@@ -54,12 +54,12 @@ public class AuthService {
     public AuthService(Context context) {
         mContext = context;
         try {
-            mClient = new MobileServiceClient("https://<mobileserviceurl>.azure-mobile.net/",
-                    "<applicationkey>", mContext)
+            mClient = new MobileServiceClient("https://customauthtest.azure-mobile.net/",
+                    "MQKBPWAPBBfzPRHUNVSkgaTmPDFtYw12", mContext)
                     .withFilter(new MyServiceFilter());
-            mTableAccounts = mClient.getTable("Accounts");
-            mTableAuthData = mClient.getTable("AuthData");
-            mTableBadAuth = mClient.getTable("BadAuth");
+            mTableAccounts = mClient.getTable("accounts");
+            mTableAuthData = mClient.getTable("authData");
+            mTableBadAuth = mClient.getTable("badAuth");
         } catch (MalformedURLException e) {
             Log.e(TAG, "There was an error creating the Mobile Service.  Verify the URL");
         }
@@ -248,6 +248,8 @@ public class AuthService {
                 @Override
                 public void onResponse(ServiceFilterResponse response, Exception exception) {
                     if (exception != null) {
+                        //Error begining here : Error while processing request
+
                         Log.e(TAG, "MyServiceFilter onResponse Exception: " + exception.getMessage());
                     }
 

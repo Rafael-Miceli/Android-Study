@@ -32,6 +32,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+//        AuthenticationApplication myApp = (AuthenticationApplication) getApplication();
+//        myApp.setCurrentActivity(this);
+        mAuthService = new AuthService(this);
+
         mTxtUsername = (EditText) findViewById(R.id.editTextLogin);
         mTxtPassword = (EditText) findViewById(R.id.editTextPassword);
 
@@ -60,6 +64,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     Intent loggedInIntent = new Intent(getApplicationContext(), LoggedIn.class);
                     startActivity(loggedInIntent);
                 } else {
+                    //Erro ocorrendo neste momento
+
                     Log.e(TAG, "Error loggin in: " + exception.getMessage());
                 }
             }
