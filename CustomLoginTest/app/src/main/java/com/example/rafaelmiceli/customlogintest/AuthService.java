@@ -54,12 +54,12 @@ public class AuthService {
     public AuthService(Context context) {
         mContext = context;
         try {
-            mClient = new MobileServiceClient("https://customauthtest.azure-mobile.net/",
-                    "MQKBPWAPBBfzPRHUNVSkgaTmPDFtYw12", mContext)
+            mClient = new MobileServiceClient("mobile-service-url",
+                    "mobile-service-app-key", mContext)
                     .withFilter(new MyServiceFilter());
-            mTableAccounts = mClient.getTable("accounts");
-            mTableAuthData = mClient.getTable("authData");
-            mTableBadAuth = mClient.getTable("badAuth");
+            mTableAccounts = mClient.getTable("Accounts");
+            mTableAuthData = mClient.getTable("AuthData");
+            mTableBadAuth = mClient.getTable("BadAuth");
         } catch (MalformedURLException e) {
             Log.e(TAG, "There was an error creating the Mobile Service.  Verify the URL");
         }
@@ -174,17 +174,13 @@ public class AuthService {
      * Register the user if they're creating a custom auth account
      * @param username
      * @param password
-     * @param confirm
-     * @param email
      * @param callback
      */
-    public void registerUser(String username, String password, String confirm,
-                             String email,
-                             TableJsonOperationCallback callback) {
+    public void registerUser(String username, String password,  TableJsonOperationCallback callback) {
         JsonObject newUser = new JsonObject();
         newUser.addProperty("username", username);
         newUser.addProperty("password", password);
-        newUser.addProperty("email", email);
+        //newUser.addProperty("email", email);
 
         mTableAccounts.insert(newUser, callback);
     }
