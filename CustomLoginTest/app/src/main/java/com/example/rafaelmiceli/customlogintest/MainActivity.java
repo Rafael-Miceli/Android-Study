@@ -22,6 +22,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private final String TAG = "MainActivity";
 
     private Button new_button;
+    private Button btnCadastrar;
     protected AuthService mAuthService;
 
     private EditText mTxtUsername;
@@ -32,8 +33,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        AuthenticationApplication myApp = (AuthenticationApplication) getApplication();
-//        myApp.setCurrentActivity(this);
         mAuthService = new AuthService(this);
 
         mTxtUsername = (EditText) findViewById(R.id.editTextLogin);
@@ -41,10 +40,19 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         new_button = (Button)findViewById(R.id.button);
         new_button.setOnClickListener(this);
+        btnCadastrar = (Button)findViewById(R.id.btnIrParaCadastro);
+        btnCadastrar.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
+        if (v.getId() == R.id.button)
+            loginClick(v);
+        if (v.getId() == R.id.btnIrParaCadastro)
+            registerClick(v);
+    }
+
+    public void loginClick(View v){
         Toast.makeText(this, "Me Clicou", Toast.LENGTH_LONG).show();
 
         if (mTxtPassword.getText().toString().equals("") ||
@@ -70,5 +78,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 }
             }
         });
+    }
+
+    public void registerClick(View v){
+        Intent intent = new Intent(getApplicationContext(), RegisterAccountActivity.class);
+        startActivity(intent);
     }
 }
