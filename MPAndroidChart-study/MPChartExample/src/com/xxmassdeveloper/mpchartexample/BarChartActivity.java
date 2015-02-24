@@ -10,7 +10,9 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -37,9 +39,10 @@ import com.xxmassdeveloper.mpchartexample.notimportant.DemoBase;
 
 import java.util.ArrayList;
 
-public class BarChartActivity extends FragmentActivity {
+public class BarChartActivity extends FragmentActivity implements View.OnClickListener {
 
     protected BarChart mChart;
+    private Button loadButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +50,9 @@ public class BarChartActivity extends FragmentActivity {
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_barchart);
+
+        loadButton = (Button)findViewById(R.id.loadButton);
+        loadButton.setOnClickListener(this);
 
         mChart = (BarChart) findViewById(R.id.chart1);
 
@@ -58,7 +64,7 @@ public class BarChartActivity extends FragmentActivity {
 
         // if more than 60 entries are displayed in the chart, no values will be
         // drawn
-        mChart.setMaxVisibleValueCount(60);
+        mChart.setMaxVisibleValueCount(1);
 
         // scaling can now only be done on x- and y-axis separately
         mChart.setPinchZoom(false);
@@ -94,7 +100,7 @@ public class BarChartActivity extends FragmentActivity {
 
         mChart.setValueTypeface(tf);
 
-        setData(1, 50);
+        setData(1, 188);
 
         Legend l = mChart.getLegend();
         l.setEnabled(false);
@@ -109,7 +115,7 @@ public class BarChartActivity extends FragmentActivity {
 
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
-        yVals1.add(new BarEntry(12, 0));
+        yVals1.add(new BarEntry(range, 0));
 
         BarDataSet set1 = new BarDataSet(yVals1, "DataSet");
         set1.setBarSpacePercent(35f);
@@ -126,5 +132,34 @@ public class BarChartActivity extends FragmentActivity {
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.move_left_in_activity, R.anim.move_right_out_activity);
+    }
+
+    @Override
+    public void onClick(View view) {
+        mChart = (BarChart) findViewById(R.id.chart1);
+
+        updateData(1, 150);
+    }
+
+    private void updateData(int count, float range) {
+
+        BarData bardata = mChart.getBarData();
+        BarDataSet barDataset = bardata.getDataSetByIndex(0);
+
+        ArrayList<BarEntry> yVals = barDataset.getYVals();
+        BarEntry barEntry = yVals.get(0);
+        barEntry.setVal(range);
+
+        bardata.notifyDataChanged();
+
+        mChart.invalidate();
+
+        Float value = 200 - range;
+
+        TextView txtValue = (TextView) findViewById(R.id.seekBar1);
+        txtValue.setText(value.toString());
+
+        txtValue.invalidate();
+
     }
 }

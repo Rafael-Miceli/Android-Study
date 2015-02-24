@@ -14,7 +14,7 @@
         android:id="@+id/seekBar1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/button"
+        android:layout_above="@+id/loadButton"
         android:layout_margin="8dp"
         android:layout_marginBottom="35dp"
         android:layout_marginRight="5dp"
@@ -34,14 +34,14 @@
         android:layout_marginBottom="12dp"
         android:layout_marginRight="10dp"
         android:gravity="left"
-        android:layout_above="@+id/button"
+        android:layout_above="@+id/loadButton"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Carregar Dado"
-        android:id="@+id/button"
+        android:id="@+id/loadButton"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"

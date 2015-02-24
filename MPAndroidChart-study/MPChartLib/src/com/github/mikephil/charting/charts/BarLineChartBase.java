@@ -266,9 +266,9 @@ public abstract class BarLineChartBase<T extends BarLineScatterCandleData<? exte
     protected void calcMinMax() {
 
         float minLeft = mData.getYMin(AxisDependency.LEFT);
-        float maxLeft = mData.getYMax(AxisDependency.LEFT);
+        float maxLeft = 190; //mData.getYMax(AxisDependency.LEFT);
         float minRight = mData.getYMin(AxisDependency.RIGHT);
-        float maxRight = mData.getYMax(AxisDependency.RIGHT);
+        float maxRight = 190; //mData.getYMax(AxisDependency.RIGHT);
 
         float leftRange = Math.abs(maxLeft - (mAxisLeft.isStartAtZeroEnabled() ? 0 : minLeft));
         float rightRange = Math.abs(maxRight - (mAxisRight.isStartAtZeroEnabled() ? 0 : minRight));
