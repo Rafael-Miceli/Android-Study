@@ -284,8 +284,7 @@ public class BarChartRenderer extends DataRenderer {
 
     /**
      * Draws a value at the specified x and y position.
-     * 
-     * @param value
+     *
      * @param xPos
      * @param yPos
      */
