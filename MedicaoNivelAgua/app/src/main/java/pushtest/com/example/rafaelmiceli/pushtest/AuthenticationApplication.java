@@ -12,12 +12,6 @@ public class AuthenticationApplication extends Application {
 
     public AuthenticationApplication() {}
 
-    public AuthService getAuthService() {
-        if (mAuthService == null) {
-            mAuthService = new AuthService(this);
-        }
-        return mAuthService;
-    }
 
     public void setCurrentActivity(Activity activity) {
         mCurrentActivity = activity;

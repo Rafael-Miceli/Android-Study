@@ -29,7 +29,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        mAuthService = new AuthService(this);
+        mAuthService = AuthService.getInstance(this);
 
         mTxtUsername = (EditText) findViewById(R.id.editTextLogin);
         mTxtPassword = (EditText) findViewById(R.id.editTextPassword);
@@ -44,7 +44,6 @@ public class LoginActivity extends Activity implements View.OnClickListener {
     }
 
     public void loginClick(View v){
-        Toast.makeText(this, "Me Clicou", Toast.LENGTH_LONG).show();
 
         if (mTxtPassword.getText().toString().equals("") ||
                 mTxtUsername.getText().toString().equals("")) {

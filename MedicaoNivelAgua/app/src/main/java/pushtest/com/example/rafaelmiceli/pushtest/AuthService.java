@@ -57,8 +57,19 @@ public class AuthService {
     private GoogleCloudMessaging gcm;
     private NotificationHub hub;
 
-    public AuthService(Context context) {
+    private static AuthService instance;
+
+    public static AuthService getInstance(Context context)
+    {
+        if (instance == null)
+            instance = new AuthService(context);
+
+        return instance;
+    }
+
+    private AuthService(Context context) {
         mContext = context;
+
         try {
             mClient = new MobileServiceClient("https://arduinoapp.azure-mobile.net/",
                     "QkTMsFHSEaNGuiKVsywYYHpHnIHMUB64", mContext)
@@ -76,8 +87,6 @@ public class AuthService {
             Log.e(TAG, "There was an error creating the Mobile Service.  Verify the URL");
         }
     }
-
-
 
     public void setContext(Context context) {
         mClient.setContext(context);
@@ -205,8 +214,30 @@ public class AuthService {
             }
 
             protected void onPostExecute(Object result) {
-                String message = "Subscribed for clients: "
+                String message = "Bem-vindo as informacões de água de: "
                         + clients.toString();
+                Toast.makeText(mContext, message,
+                        Toast.LENGTH_LONG).show();
+            }
+        }.execute(null, null, null);
+    }
+
+    public void unsubscribeToClient() {
+        new AsyncTask<Object, Object, Object>() {
+            @Override
+            protected Object doInBackground(Object... params) {
+                try {
+                    String regid = gcm.register(SENDER_ID);
+                    hub.unregister();
+                } catch (Exception e) {
+                    Log.e("MainActivity", "Failed to register - " + e.getMessage());
+                    return e;
+                }
+                return null;
+            }
+
+            protected void onPostExecute(Object result) {
+                String message = "Unsubscribed for clients";
                 Toast.makeText(mContext, message,
                         Toast.LENGTH_LONG).show();
             }
@@ -252,6 +283,8 @@ public class AuthService {
         mClient.logout();
         //Take the user back to the auth activity to relogin if requested
         if (shouldRedirectToLogin) {
+            //unsubscribe to push
+            unsubscribeToClient();
             Intent logoutIntent = new Intent(mContext, LoginActivity.class);
             logoutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             mContext.startActivity(logoutIntent);
