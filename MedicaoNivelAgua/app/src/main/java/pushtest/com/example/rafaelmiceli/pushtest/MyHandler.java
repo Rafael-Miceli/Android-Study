@@ -5,6 +5,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
@@ -16,16 +18,34 @@ public class MyHandler extends NotificationsHandler {
 
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
-    NotificationCompat.Builder builder;
     Context ctx;
+    private Integer _criticalWaterLevel = 20;
 
     @Override
     public void onReceive(Context context, Bundle bundle) {
         ctx = context;
-        String nhMessage = bundle.getString("msg");
+        String azureMessage = bundle.getString("msg");
 
-        sendNotification(nhMessage);
+        if (isCriticalWaterLevel(azureMessage))
+            sendNotification(azureMessage);
+
+        updateCharts(azureMessage);
+
+        Toast toast = Toast.makeText(ctx, azureMessage, Toast.LENGTH_LONG);
+        toast.show();
     }
+
+    private boolean isCriticalWaterLevel(String azureMessage) {
+        //Nós medimos o nível de criticidade de nível de água de acordo com quantos centimetros cairam
+        //do nível total do reservatório de água.
+
+        return Integer.parseInt(azureMessage) >= _criticalWaterLevel;
+
+    }
+
+    private void updateCharts(String azureMessage) {
+    }
+
 
     private void sendNotification(String msg) {
         mNotificationManager = (NotificationManager)
@@ -34,16 +54,16 @@ public class MyHandler extends NotificationsHandler {
         PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0,
                 new Intent(ctx, MyActivity.class), 0);
 
+        Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(ctx)
                         .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("Notification Hub Demo")
+                        .setContentTitle("Nível de água muito baixo!")
                         .setStyle(new NotificationCompat.BigTextStyle()
                                 .bigText(msg))
-                        .setContentText(msg);
-
-        Toast toast = Toast.makeText(ctx, msg, Toast.LENGTH_LONG);
-        toast.show();
+                        .setContentText(msg)
+                        .setSound(notificationSound);
 
         mBuilder.setContentIntent(contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
