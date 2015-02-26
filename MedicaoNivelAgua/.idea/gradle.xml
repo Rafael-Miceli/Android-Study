@@ -9,6 +9,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/MPChartLib" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/notification-hubs-0.4" />
             <option value="$PROJECT_DIR$/notifications-1.0.1" />
