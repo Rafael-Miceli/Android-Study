@@ -132,7 +132,7 @@ public class AuthService {
             protected Void doInBackground(Void... params) {
                 try {
                     //Thread.sleep(5000);
-                    //mTableAuthData.execute(callback);
+                    mTableAuthData.execute(mTableAuthData.parameter("table", mTableAuthData.getTableName()) ,callback);
                 } catch (Exception exception) {
                     Log.e("ErrorAuthService", "Error Azure AuthService - " + exception.getMessage());
                 }
@@ -197,7 +197,7 @@ public class AuthService {
         String token = jsonObject.getAsJsonPrimitive("token").getAsString();
         String client = jsonObject.getAsJsonPrimitive("client").getAsString();
 
-        //mTableAuthData = mClient.getTable(client);
+        mTableAuthData = mClient.getTable(client);
 
         Set<String> clients = new HashSet<>();
         clients.add(client);

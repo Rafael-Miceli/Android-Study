@@ -7,6 +7,8 @@ import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
@@ -27,10 +29,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 
-public class MyActivity extends FragmentActivity {
+public class MyActivity extends FragmentActivity implements View.OnClickListener {
 
     protected BarChart mChart;
     private Context mContext = this;
+    private Button btnTest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +41,9 @@ public class MyActivity extends FragmentActivity {
         setContentView(R.layout.activity_my);
 
         mChart = (BarChart) findViewById(R.id.chart1);
+        btnTest = (Button) findViewById(R.id.btnTest);
 
+        btnTest.setOnClickListener(this);
         mChart.setDrawValueAboveBar(true);
 
         mChart.setDescription("");
@@ -81,7 +86,7 @@ public class MyActivity extends FragmentActivity {
 
         mChart.setValueTypeface(tf);
 
-        Integer value = getLatestWaterDistance();
+        Integer value = 188; //getLatestWaterDistance();
 
         setData(value);
 
@@ -136,26 +141,40 @@ public class MyActivity extends FragmentActivity {
 
     public Integer getLatestWaterDistance() {
 
-//        AuthService.getInstance(this).getLatestLevelFromAzure(new TableJsonQueryCallback() {
-//            @Override
-//            public void onCompleted(JsonElement jsonElement, int i, Exception e, ServiceFilterResponse serviceFilterResponse) {
-//                try {
-//                    JsonArray results = jsonElement.getAsJsonArray();
-//
-//                    for (JsonElement item : results){
-//
-//                        String value = item.getAsJsonObject().getAsJsonPrimitive("Nivel").getAsString();
-//
-//                        Toast.makeText(mContext, value,
-//                                Toast.LENGTH_LONG).show();
-//                    }
-//                }
-//                catch (Exception exception) {
-//                    Log.e("ErrorActivity", "Error Azure Activity - " + exception.getMessage());
-//                }
-//            }
-//        });
+        AuthService.getInstance(this).getLatestLevelFromAzure(new TableJsonQueryCallback() {
+            @Override
+            public void onCompleted(JsonElement jsonElement, int i, Exception e, ServiceFilterResponse serviceFilterResponse) {
+                try {
+                    if (e != null) {
+                        Log.e("ErrorActivity", "Error Azure Activity - " + e.getMessage());
+                        return;
+                    }
+
+                    JsonArray results = jsonElement.getAsJsonArray();
+
+                    for (JsonElement item : results){
+
+                        String value = item.getAsJsonObject().getAsJsonPrimitive("Nivel").getAsString();
+
+                        Toast.makeText(mContext, value,
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+                catch (Exception exception) {
+                    Log.e("ErrorActivity", "Error Azure Activity - " + exception.getMessage());
+                }
+            }
+        });
 
         return 188;
+    }
+
+    @Override
+    public void onClick(View v) {
+        Integer value = getLatestWaterDistance();
+
+        setData(value);
+
+        mChart.invalidate();
     }
 }
