@@ -1,11 +1,13 @@
 package pushtest.com.example.rafaelmiceli.pushtest;
 
-import android.app.Activity;
+import android.content.Context;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
@@ -14,6 +16,13 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
+import com.microsoft.windowsazure.mobileservices.TableJsonQueryCallback;
+
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -21,6 +30,7 @@ import java.util.ArrayList;
 public class MyActivity extends FragmentActivity {
 
     protected BarChart mChart;
+    private Context mContext = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,14 +81,16 @@ public class MyActivity extends FragmentActivity {
 
         mChart.setValueTypeface(tf);
 
-        setData(1, 188);
+        Integer value = getLatestWaterDistance();
+
+        setData(value);
 
         Legend l = mChart.getLegend();
         l.setEnabled(false);
 
     }
 
-    private void setData(int count, float range) {
+    private void setData(float range) {
 
         ArrayList<String> xVals = new ArrayList<String>();
 
@@ -122,4 +134,28 @@ public class MyActivity extends FragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public Integer getLatestWaterDistance() {
+
+        AuthService.getInstance(this).getLatestLevelFromAzure(new TableJsonQueryCallback() {
+            @Override
+            public void onCompleted(JsonElement jsonElement, int i, Exception e, ServiceFilterResponse serviceFilterResponse) {
+                try {
+                    JsonArray results = jsonElement.getAsJsonArray();
+
+                    for (JsonElement item : results){
+
+                        String value = item.getAsJsonObject().getAsJsonPrimitive("Nivel").getAsString();
+
+                        Toast.makeText(mContext, value,
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+                catch (Exception exception) {
+                    Log.e("ErrorActivity", "Error Azure Activity - " + exception.getMessage());
+                }
+            }
+        });
+
+        return 188;
+    }
 }
