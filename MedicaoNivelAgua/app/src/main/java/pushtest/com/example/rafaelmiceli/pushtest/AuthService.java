@@ -236,7 +236,9 @@ public class AuthService {
             }
 
             protected void onPostExecute(Object result) {
-                Toast.makeText(mContext, result.toString(), Toast.LENGTH_LONG).show();
+                if (result != null)
+                    Toast.makeText(mContext, result.toString(), Toast.LENGTH_LONG).show();
+
                 String message = "Bem-vindo as informacões do reservatório de: " + clients.toString();
                 Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
             }

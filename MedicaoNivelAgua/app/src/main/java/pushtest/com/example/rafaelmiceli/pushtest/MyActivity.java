@@ -136,25 +136,25 @@ public class MyActivity extends FragmentActivity {
 
     public Integer getLatestWaterDistance() {
 
-        AuthService.getInstance(this).getLatestLevelFromAzure(new TableJsonQueryCallback() {
-            @Override
-            public void onCompleted(JsonElement jsonElement, int i, Exception e, ServiceFilterResponse serviceFilterResponse) {
-                try {
-                    JsonArray results = jsonElement.getAsJsonArray();
-
-                    for (JsonElement item : results){
-
-                        String value = item.getAsJsonObject().getAsJsonPrimitive("Nivel").getAsString();
-
-                        Toast.makeText(mContext, value,
-                                Toast.LENGTH_LONG).show();
-                    }
-                }
-                catch (Exception exception) {
-                    Log.e("ErrorActivity", "Error Azure Activity - " + exception.getMessage());
-                }
-            }
-        });
+//        AuthService.getInstance(this).getLatestLevelFromAzure(new TableJsonQueryCallback() {
+//            @Override
+//            public void onCompleted(JsonElement jsonElement, int i, Exception e, ServiceFilterResponse serviceFilterResponse) {
+//                try {
+//                    JsonArray results = jsonElement.getAsJsonArray();
+//
+//                    for (JsonElement item : results){
+//
+//                        String value = item.getAsJsonObject().getAsJsonPrimitive("Nivel").getAsString();
+//
+//                        Toast.makeText(mContext, value,
+//                                Toast.LENGTH_LONG).show();
+//                    }
+//                }
+//                catch (Exception exception) {
+//                    Log.e("ErrorActivity", "Error Azure Activity - " + exception.getMessage());
+//                }
+//            }
+//        });
 
         return 188;
     }
