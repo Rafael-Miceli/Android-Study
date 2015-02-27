@@ -1,15 +1,17 @@
 package pushtest.com.example.rafaelmiceli.pushtest;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
@@ -20,20 +22,17 @@ import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.TableJsonQueryCallback;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 
-public class MyActivity extends FragmentActivity implements View.OnClickListener {
+public class MyActivity extends Activity {
 
     protected BarChart mChart;
     private Context mContext = this;
-    private Button btnTest;
+    private TextView mTxtCmDown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +40,9 @@ public class MyActivity extends FragmentActivity implements View.OnClickListener
         setContentView(R.layout.activity_my);
 
         mChart = (BarChart) findViewById(R.id.chart1);
-        btnTest = (Button) findViewById(R.id.btnTest);
-
-        btnTest.setOnClickListener(this);
         mChart.setDrawValueAboveBar(true);
+
+        mTxtCmDown = (TextView) findViewById(R.id.txtCmDown);
 
         mChart.setDescription("");
 
@@ -86,7 +84,7 @@ public class MyActivity extends FragmentActivity implements View.OnClickListener
 
         mChart.setValueTypeface(tf);
 
-        Integer value = 188; //getLatestWaterDistance();
+        Integer value = getLatestWaterDistance();
 
         setData(value);
 
@@ -94,6 +92,19 @@ public class MyActivity extends FragmentActivity implements View.OnClickListener
         l.setEnabled(false);
 
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        mContext.registerReceiver(mMessageReceiver, new IntentFilter("water_level"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mContext.unregisterReceiver(mMessageReceiver);
+    }
+
 
     private void setData(float range) {
 
@@ -141,40 +152,50 @@ public class MyActivity extends FragmentActivity implements View.OnClickListener
 
     public Integer getLatestWaterDistance() {
 
-        AuthService.getInstance(this).getLatestLevelFromAzure(new TableJsonQueryCallback() {
+        final Integer[] latestWaterDistance = {0};
+
+        WaterLevelService.getInstance(this).getLatestLevelFromAzure(new TableJsonQueryCallback() {
             @Override
             public void onCompleted(JsonElement jsonElement, int i, Exception e, ServiceFilterResponse serviceFilterResponse) {
                 try {
                     if (e != null) {
-                        Log.e("ErrorActivity", "Error Azure Activity - " + e.getMessage());
+                        Log.e("ErrorActivity", "Error Azure Activity from WaterLevelService - " + e.getMessage());
                         return;
                     }
 
                     JsonArray results = jsonElement.getAsJsonArray();
 
+
                     for (JsonElement item : results){
 
-                        String value = item.getAsJsonObject().getAsJsonPrimitive("Nivel").getAsString();
-
-                        Toast.makeText(mContext, value,
-                                Toast.LENGTH_LONG).show();
+                       latestWaterDistance[0] = item.getAsJsonObject().getAsJsonPrimitive("Nivel").getAsInt();
                     }
+
+                    updateViews(latestWaterDistance[0]);
                 }
                 catch (Exception exception) {
-                    Log.e("ErrorActivity", "Error Azure Activity - " + exception.getMessage());
+                    Log.e("ErrorActivity", "Error Azure Activity in Activity - " + exception.getMessage());
                 }
             }
         });
 
-        return 188;
+        return 200;
     }
 
-    @Override
-    public void onClick(View v) {
-        Integer value = getLatestWaterDistance();
-
-        setData(value);
-
+    public void updateViews(Integer latestWaterDistance) {
+        setData((200 - latestWaterDistance));
+        mTxtCmDown.setText(latestWaterDistance.toString());
         mChart.invalidate();
+        mTxtCmDown.invalidate();
     }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String message = intent.getStringExtra("azureMessage");
+
+            updateViews(Integer.parseInt(message));
+        }
+    };
 }

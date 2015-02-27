@@ -34,7 +34,7 @@
         android:layout_marginBottom="54dp"
         android:layout_marginRight="5dp"
         android:layout_alignParentBottom="true"
-        android:text="12"
+        android:text="0"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     <TextView
@@ -49,11 +49,5 @@
         android:gravity="left"
         android:layout_alignParentBottom="true"
         android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnTest"
-        android:text="Teste"/>
 
 </RelativeLayout>

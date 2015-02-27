@@ -77,7 +77,6 @@ public class AuthService {
 
             mTableAccounts = mClient.getTable("accounts");
             mTableBadAuth = mClient.getTable("BadAuth");
-            //mTableAuthData = mClient.getTable("ClienteTeste1");
 
             NotificationsManager.handleNotifications(mContext, SENDER_ID, MyHandler.class);
 
@@ -124,23 +123,6 @@ public class AuthService {
 
     public void getAuthData(TableJsonQueryCallback callback) {
         mTableAuthData.where().execute(callback);
-    }
-
-    public Integer getLatestLevelFromAzure(final TableJsonQueryCallback callback){
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                try {
-                    //Thread.sleep(5000);
-                    mTableAuthData.execute(mTableAuthData.parameter("table", mTableAuthData.getTableName()) ,callback);
-                } catch (Exception exception) {
-                    Log.e("ErrorAuthService", "Error Azure AuthService - " + exception.getMessage());
-                }
-                return null;
-            }
-        }.execute();
-
-        return 188;
     }
 
     /**
@@ -197,7 +179,7 @@ public class AuthService {
         String token = jsonObject.getAsJsonPrimitive("token").getAsString();
         String client = jsonObject.getAsJsonPrimitive("client").getAsString();
 
-        mTableAuthData = mClient.getTable(client);
+        WaterLevelService.getInstance(mContext).setClientTableData(client);
 
         Set<String> clients = new HashSet<>();
         clients.add(client);
