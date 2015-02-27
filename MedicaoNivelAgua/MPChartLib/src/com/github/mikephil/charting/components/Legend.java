@@ -112,6 +112,7 @@ public class Legend {
 
         this.mColors = colors;
         this.mLabels = labels;
+        this.mLabels = labels;
     }
 
     /**

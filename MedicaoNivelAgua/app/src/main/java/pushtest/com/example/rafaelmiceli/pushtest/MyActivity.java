@@ -40,28 +40,14 @@ public class MyActivity extends Activity {
         setContentView(R.layout.activity_my);
 
         mChart = (BarChart) findViewById(R.id.chart1);
-        mChart.setDrawValueAboveBar(true);
 
         mTxtCmDown = (TextView) findViewById(R.id.txtCmDown);
 
         mChart.setDescription("");
-
-        // if more than 60 entries are displayed in the chart, no values will be
-        // drawn
-        mChart.setMaxVisibleValueCount(1);
-
-        // scaling can now only be done on x- and y-axis separately
+        mChart.setDrawValueAboveBar(true);
+        mChart.setMaxVisibleValueCount(2);
         mChart.setPinchZoom(false);
-
-        // draw shadows for each bar that show the maximum value
-        // mChart.setDrawBarShadow(true);
-
-        // mChart.setDrawXLabels(false);
-
         mChart.setDrawGridBackground(false);
-        // mChart.setDrawYLabels(false);
-
-        // sets the text size of the values inside the chart
         mChart.setValueTextSize(10f);
 
         Typeface tf = Typeface.createFromAsset(getAssets(), "OpenSans-Regular.ttf");
@@ -89,22 +75,10 @@ public class MyActivity extends Activity {
         setData(value);
 
         Legend l = mChart.getLegend();
-        l.setEnabled(false);
+        l.setLegendLabels(new String[] {"Nível d'água"});
+        l.setEnabled(true);
 
     }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-        mContext.registerReceiver(mMessageReceiver, new IntentFilter("water_level"));
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mContext.unregisterReceiver(mMessageReceiver);
-    }
-
 
     private void setData(float range) {
 
@@ -116,7 +90,7 @@ public class MyActivity extends Activity {
 
         yVals1.add(new BarEntry(range, 0));
 
-        BarDataSet set1 = new BarDataSet(yVals1, "DataSet");
+        BarDataSet set1 = new BarDataSet(yVals1, "Nível d'água");
         set1.setBarSpacePercent(35f);
 
         ArrayList<BarDataSet> dataSets = new ArrayList<BarDataSet>();
@@ -187,6 +161,18 @@ public class MyActivity extends Activity {
         mTxtCmDown.setText(latestWaterDistance.toString());
         mChart.invalidate();
         mTxtCmDown.invalidate();
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        mContext.registerReceiver(mMessageReceiver, new IntentFilter("water_level"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mContext.unregisterReceiver(mMessageReceiver);
     }
 
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
