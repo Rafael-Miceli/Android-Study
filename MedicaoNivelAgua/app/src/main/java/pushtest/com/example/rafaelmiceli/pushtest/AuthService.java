@@ -30,6 +30,7 @@ import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 import com.microsoft.windowsazure.mobileservices.MobileServiceJsonTable;
 import com.microsoft.windowsazure.mobileservices.MobileServiceUser;
 import com.microsoft.windowsazure.mobileservices.NextServiceFilterCallback;
+import com.microsoft.windowsazure.mobileservices.QueryOrder;
 import com.microsoft.windowsazure.mobileservices.ServiceFilter;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterRequest;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
@@ -71,9 +72,9 @@ public class AuthService {
         mContext = context;
 
         try {
-            mClient = new MobileServiceClient("https://arduinoapp.azure-mobile.net/",
-                    "QkTMsFHSEaNGuiKVsywYYHpHnIHMUB64", mContext)
+            mClient = new MobileServiceClient("https://arduinoapp.azure-mobile.net/", "QkTMsFHSEaNGuiKVsywYYHpHnIHMUB64", mContext)
                     .withFilter(new MyServiceFilter());
+
             mTableAccounts = mClient.getTable("accounts");
             mTableBadAuth = mClient.getTable("BadAuth");
 
@@ -176,9 +177,12 @@ public class AuthService {
 
         String userId = jsonObject.getAsJsonPrimitive("userId").getAsString();
         String token = jsonObject.getAsJsonPrimitive("token").getAsString();
+        String client = jsonObject.getAsJsonPrimitive("client").getAsString();
+
+        WaterLevelService.getInstance(mContext).setClientTableData(client);
 
         Set<String> clients = new HashSet<>();
-        clients.add(jsonObject.getAsJsonPrimitive("client").getAsString());
+        clients.add(client);
 
         subscribeToClient(clients);
 
@@ -214,10 +218,11 @@ public class AuthService {
             }
 
             protected void onPostExecute(Object result) {
-                String message = "Bem-vindo as informacões de água de: "
-                        + clients.toString();
-                Toast.makeText(mContext, message,
-                        Toast.LENGTH_LONG).show();
+                if (result != null)
+                    Toast.makeText(mContext, result.toString(), Toast.LENGTH_LONG).show();
+
+                String message = "Bem-vindo as informacões do reservatório de: " + clients.toString();
+                Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
             }
         }.execute(null, null, null);
     }
@@ -230,16 +235,15 @@ public class AuthService {
                     String regid = gcm.register(SENDER_ID);
                     hub.unregister();
                 } catch (Exception e) {
-                    Log.e("MainActivity", "Failed to register - " + e.getMessage());
+                    Log.e("MainActivity", "Failed to unregister - " + e.getMessage());
                     return e;
                 }
                 return null;
             }
 
             protected void onPostExecute(Object result) {
-                String message = "Unsubscribed for clients";
-                Toast.makeText(mContext, message,
-                        Toast.LENGTH_LONG).show();
+                String message = "Fim da sessão do cliente ";
+                Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
             }
         }.execute(null, null, null);
     }
@@ -323,79 +327,86 @@ public class AuthService {
             nextServiceFilterCallback.onNext(request, new ServiceFilterResponseCallback() {
                 @Override
                 public void onResponse(ServiceFilterResponse response, Exception exception) {
-                    if (exception != null) {
-                        //Error begining here : Error while processing request
 
-                        Log.e(TAG, "MyServiceFilter onResponse Exception: " + exception.getMessage());
-                    }
+                    try {
+
+                        if (exception != null) {
+                            //Error begining here : Error while processing request
+
+                            Log.e(TAG, "MyServiceFilter onResponse Exception: " + exception.getMessage());
+                        }
 
 
-                    StatusLine status = response.getStatus();
-                    int statusCode = status.getStatusCode();
-                    if (statusCode == 401) {
-                        final CountDownLatch latch = new CountDownLatch(1);
-                        //Log the user out but don't send them to the login page
-                        logout(false);
-                        //If we shouldn't retry (or they've used custom auth),
-                        //we're going to kick them out for now
-                        //If you're doing custom auth, you'd need to show your own
-                        //custom auth popup to login with
-                        if (mShouldRetryAuth && !mIsCustomAuthProvider) {
-                            //Get the current activity for the context so we can show the login dialog
-                            AuthenticationApplication myApp = (AuthenticationApplication) mContext;
-                            Activity currentActivity = myApp.getCurrentActivity();
-                            mClient.setContext(currentActivity);
+                        StatusLine status = response.getStatus();
+                        int statusCode = status.getStatusCode();
+                        if (statusCode == 401) {
+                            final CountDownLatch latch = new CountDownLatch(1);
+                            //Log the user out but don't send them to the login page
+                            logout(false);
+                            //If we shouldn't retry (or they've used custom auth),
+                            //we're going to kick them out for now
+                            //If you're doing custom auth, you'd need to show your own
+                            //custom auth popup to login with
+                            if (mShouldRetryAuth && !mIsCustomAuthProvider) {
+                                //Get the current activity for the context so we can show the login dialog
+                                AuthenticationApplication myApp = (AuthenticationApplication) mContext;
+                                Activity currentActivity = myApp.getCurrentActivity();
+                                mClient.setContext(currentActivity);
 
-                            currentActivity.runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mClient.login(mProvider, new UserAuthenticationCallback() {
-                                        @Override
-                                        public void onCompleted(MobileServiceUser user, Exception exception,
-                                                                ServiceFilterResponse response) {
-                                            if (exception == null) {
-                                                //Save their updated user data locally
-                                                saveUserData();
-                                                //Update the requests X-ZUMO-AUTH header
-                                                request.removeHeader("X-ZUMO-AUTH");
-                                                request.addHeader("X-ZUMO-AUTH", mClient.getCurrentUser().getAuthenticationToken());
+                                currentActivity.runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        mClient.login(mProvider, new UserAuthenticationCallback() {
+                                            @Override
+                                            public void onCompleted(MobileServiceUser user, Exception exception,
+                                                                    ServiceFilterResponse response) {
+                                                if (exception == null) {
+                                                    //Save their updated user data locally
+                                                    saveUserData();
+                                                    //Update the requests X-ZUMO-AUTH header
+                                                    request.removeHeader("X-ZUMO-AUTH");
+                                                    request.addHeader("X-ZUMO-AUTH", mClient.getCurrentUser().getAuthenticationToken());
 
-                                                //Add our BYPASS querystring parameter to the URL
-                                                Uri.Builder uriBuilder = Uri.parse(request.getUrl()).buildUpon();
-                                                uriBuilder.appendQueryParameter("bypass", "true");
-                                                try {
-                                                    request.setUrl(uriBuilder.build().toString());
-                                                } catch (URISyntaxException e) {
-                                                    Log.e(TAG, "Couldn't set request's new url: " + e.getMessage());
-                                                    e.printStackTrace();
+                                                    //Add our BYPASS querystring parameter to the URL
+                                                    Uri.Builder uriBuilder = Uri.parse(request.getUrl()).buildUpon();
+                                                    uriBuilder.appendQueryParameter("bypass", "true");
+                                                    try {
+                                                        request.setUrl(uriBuilder.build().toString());
+                                                    } catch (URISyntaxException e) {
+                                                        Log.e(TAG, "Couldn't set request's new url: " + e.getMessage());
+                                                        e.printStackTrace();
+                                                    }
+                                                    latch.countDown();
+
+                                                } else {
+                                                    Log.e(TAG, "User did not login successfully after 401");
+                                                    //Kick user back to login screen
+                                                    logout(true);
                                                 }
-                                                latch.countDown();
 
-                                            } else {
-                                                Log.e(TAG, "User did not login successfully after 401");
-                                                //Kick user back to login screen
-                                                logout(true);
                                             }
-
-                                        }
-                                    });
+                                        });
+                                    }
+                                });
+                                try {
+                                    latch.await();
+                                } catch (InterruptedException e) {
+                                    Log.e(TAG, "Interrupted exception: " + e.getMessage());
+                                    return;
                                 }
-                            });
-                            try {
-                                latch.await();
-                            } catch (InterruptedException e) {
-                                Log.e(TAG, "Interrupted exception: " + e.getMessage());
-                                return;
-                            }
 
-                            nextServiceFilterCallback.onNext(request, responseCallback);
-                        } else {
-                            //Log them out and proceed with the response
-                            logout(true);
+                                nextServiceFilterCallback.onNext(request, responseCallback);
+                            } else {
+                                //Log them out and proceed with the response
+                                logout(true);
+                                responseCallback.onResponse(response, exception);
+                            }
+                        } else {//
                             responseCallback.onResponse(response, exception);
                         }
-                    } else {//
-                        responseCallback.onResponse(response, exception);
+                    }
+                    catch(Exception ex) {
+                        Log.e(TAG, "MyServiceFilter onResponse Exception: " + exception.getMessage());
                     }
                 }
             });

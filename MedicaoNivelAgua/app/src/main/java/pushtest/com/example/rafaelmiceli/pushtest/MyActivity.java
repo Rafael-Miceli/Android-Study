@@ -1,11 +1,17 @@
 package pushtest.com.example.rafaelmiceli.pushtest;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
@@ -14,13 +20,19 @@ import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
+import com.microsoft.windowsazure.mobileservices.TableJsonQueryCallback;
 
 import java.util.ArrayList;
 
 
-public class MyActivity extends FragmentActivity {
+public class MyActivity extends Activity {
 
     protected BarChart mChart;
+    private Context mContext = this;
+    private TextView mTxtCmDown;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +40,9 @@ public class MyActivity extends FragmentActivity {
         setContentView(R.layout.activity_my);
 
         mChart = (BarChart) findViewById(R.id.chart1);
-
         mChart.setDrawValueAboveBar(true);
+
+        mTxtCmDown = (TextView) findViewById(R.id.txtCmDown);
 
         mChart.setDescription("");
 
@@ -71,14 +84,29 @@ public class MyActivity extends FragmentActivity {
 
         mChart.setValueTypeface(tf);
 
-        setData(1, 188);
+        Integer value = getLatestWaterDistance();
+
+        setData(value);
 
         Legend l = mChart.getLegend();
         l.setEnabled(false);
 
     }
 
-    private void setData(int count, float range) {
+    @Override
+    public void onResume(){
+        super.onResume();
+        mContext.registerReceiver(mMessageReceiver, new IntentFilter("water_level"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mContext.unregisterReceiver(mMessageReceiver);
+    }
+
+
+    private void setData(float range) {
 
         ArrayList<String> xVals = new ArrayList<String>();
 
@@ -122,4 +150,52 @@ public class MyActivity extends FragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public Integer getLatestWaterDistance() {
+
+        final Integer[] latestWaterDistance = {0};
+
+        WaterLevelService.getInstance(this).getLatestLevelFromAzure(new TableJsonQueryCallback() {
+            @Override
+            public void onCompleted(JsonElement jsonElement, int i, Exception e, ServiceFilterResponse serviceFilterResponse) {
+                try {
+                    if (e != null) {
+                        Log.e("ErrorActivity", "Error Azure Activity from WaterLevelService - " + e.getMessage());
+                        return;
+                    }
+
+                    JsonArray results = jsonElement.getAsJsonArray();
+
+
+                    for (JsonElement item : results){
+
+                       latestWaterDistance[0] = item.getAsJsonObject().getAsJsonPrimitive("Nivel").getAsInt();
+                    }
+
+                    updateViews(latestWaterDistance[0]);
+                }
+                catch (Exception exception) {
+                    Log.e("ErrorActivity", "Error Azure Activity in Activity - " + exception.getMessage());
+                }
+            }
+        });
+
+        return 200;
+    }
+
+    public void updateViews(Integer latestWaterDistance) {
+        setData((200 - latestWaterDistance));
+        mTxtCmDown.setText(latestWaterDistance.toString());
+        mChart.invalidate();
+        mTxtCmDown.invalidate();
+    }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String message = intent.getStringExtra("azureMessage");
+
+            updateViews(Integer.parseInt(message));
+        }
+    };
 }

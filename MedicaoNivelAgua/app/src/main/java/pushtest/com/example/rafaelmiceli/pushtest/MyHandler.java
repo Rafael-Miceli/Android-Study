@@ -18,12 +18,13 @@ public class MyHandler extends NotificationsHandler {
 
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
-    Context ctx;
+    Context context;
     private Integer _criticalWaterLevel = 20;
+
 
     @Override
     public void onReceive(Context context, Bundle bundle) {
-        ctx = context;
+        this.context = context;
         String azureMessage = bundle.getString("msg");
 
         if (isCriticalWaterLevel(azureMessage))
@@ -31,7 +32,7 @@ public class MyHandler extends NotificationsHandler {
 
         updateCharts(azureMessage);
 
-        Toast toast = Toast.makeText(ctx, azureMessage, Toast.LENGTH_LONG);
+        Toast toast = Toast.makeText(this.context, azureMessage, Toast.LENGTH_LONG);
         toast.show();
     }
 
@@ -44,20 +45,26 @@ public class MyHandler extends NotificationsHandler {
     }
 
     private void updateCharts(String azureMessage) {
+
+        Intent intent = new Intent("water_level");
+
+        intent.putExtra("azureMessage", azureMessage);
+
+        context.sendBroadcast(intent);
     }
 
 
     private void sendNotification(String msg) {
         mNotificationManager = (NotificationManager)
-                ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        PendingIntent contentIntent = PendingIntent.getActivity(ctx, 0,
-                new Intent(ctx, MyActivity.class), 0);
+        PendingIntent contentIntent = PendingIntent.getActivity(context, 0,
+                new Intent(context, MyActivity.class), 0);
 
         Uri notificationSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
         NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(ctx)
+                new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_launcher)
                         .setContentTitle("Nível de água muito baixo!")
                         .setStyle(new NotificationCompat.BigTextStyle()
