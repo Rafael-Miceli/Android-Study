@@ -54,25 +54,33 @@ public class LoginActivity extends Activity implements View.OnClickListener {
             @Override
             protected void onPreExecute(){
                 progressBar.setVisibility(View.VISIBLE);
+                login_button.setEnabled(false);
             }
 
             @Override
             protected Object doInBackground(Object... params) {
 
-                loginClick(v);
-                return null;
+                return loginClick(v);
+
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                if (!(Boolean)o) {
+                    progressBar.setVisibility(View.GONE);
+                    login_button.setEnabled(true);
+                }
             }
         }.execute(null, null, null);
-
     }
 
-    public void loginClick(View v){
+    public boolean loginClick(View v){
 
         if (mTxtPassword.getText().toString().equals("") ||
                 mTxtUsername.getText().toString().equals("")) {
             //We're just logging this here, we should show something to the user
             Log.w(TAG, "Username or password not entered");
-            return;
+            return false;
         }
 
         try {
@@ -93,10 +101,16 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
                             Log.e(TAG, "Error loggin in: " + exception.getMessage());
                         }
-                    }
-                    catch (Exception ex) {
+                    } catch (Exception ex) {
                         Log.e(TAG, "Error loggin in em callback: " + ex.getMessage());
                         Toast.makeText(mContext, "Falha com realização de login: Verifique sua conexão com a Internet", Toast.LENGTH_LONG).show();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressBar.setVisibility(View.GONE);
+                                login_button.setEnabled(true);
+                            }
+                        });
                     }
                 }
             });
@@ -104,7 +118,10 @@ public class LoginActivity extends Activity implements View.OnClickListener {
         catch (Exception ex) {
             Log.e(TAG, "Error loggin in: " + ex.getMessage());
             Toast.makeText(mContext, "Falha com realização de login: Verifique sua conexão com a Internet", Toast.LENGTH_LONG).show();
+            return false;
         }
+
+        return true;
     }
 
 }
