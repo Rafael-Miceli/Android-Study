@@ -31,9 +31,6 @@ public class MyHandler extends NotificationsHandler {
             sendNotification(azureMessage);
 
         updateCharts(azureMessage);
-
-        Toast toast = Toast.makeText(this.context, azureMessage, Toast.LENGTH_LONG);
-        toast.show();
     }
 
     private boolean isCriticalWaterLevel(String azureMessage) {

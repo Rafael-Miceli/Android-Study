@@ -3,12 +3,15 @@ package pushtest.com.example.rafaelmiceli.pushtest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
@@ -24,6 +27,8 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
     private EditText mTxtUsername;
     private EditText mTxtPassword;
+    private ProgressBar progressBar;
+
     private Context mContext = this;
 
     @Override
@@ -38,11 +43,27 @@ public class LoginActivity extends Activity implements View.OnClickListener {
 
         login_button = (Button)findViewById(R.id.button);
         login_button.setOnClickListener(this);
+
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
     }
 
     @Override
-    public void onClick(View v) {
-        loginClick(v);
+    public void onClick(final View v) {
+
+        new AsyncTask<Object, Object, Object>() {
+            @Override
+            protected void onPreExecute(){
+                progressBar.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            protected Object doInBackground(Object... params) {
+
+                loginClick(v);
+                return null;
+            }
+        }.execute(null, null, null);
+
     }
 
     public void loginClick(View v){
@@ -60,6 +81,7 @@ public class LoginActivity extends Activity implements View.OnClickListener {
                 public void onCompleted(JsonObject jsonObject, Exception exception,
                                         ServiceFilterResponse response) {
                     try {
+
                         if (exception == null) {
                             //If they've registered successfully, we'll save and set the userdata and then
                             //show the logged in activity
