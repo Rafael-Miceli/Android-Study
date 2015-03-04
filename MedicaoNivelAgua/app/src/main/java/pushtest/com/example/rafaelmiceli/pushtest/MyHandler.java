@@ -19,7 +19,7 @@ public class MyHandler extends NotificationsHandler {
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
     Context context;
-    private Integer _criticalWaterLevel = 20;
+    public static Integer _criticalWaterLevel = 20;
 
 
     @Override

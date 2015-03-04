@@ -16,6 +16,7 @@ import java.net.MalformedURLException;
  */
 public class WaterLevelService {
 
+    private MobileServiceJsonTable mClientsTanksTable;
     private MobileServiceJsonTable mClientTableData;
     private MobileServiceClient mClient;
     private Context mContext;
@@ -34,6 +35,8 @@ public class WaterLevelService {
 
         try {
             mClient = new MobileServiceClient("https://arduinoapp.azure-mobile.net/", "QkTMsFHSEaNGuiKVsywYYHpHnIHMUB64", mContext);
+
+            mClientsTanksTable = mClient.getTable("ClientsTanks");
 
         } catch (MalformedURLException e) {
             Log.e("WaterLevelService", "There was an error creating the Mobile Service.  Verify the URL");
@@ -59,4 +62,19 @@ public class WaterLevelService {
         }.execute();
 
     }
+
+    public void setCriticalLevel(final TableJsonQueryCallback callback) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    mClientsTanksTable.where().field("id").eq("ACB10227-B6C9-4F49-A2AF-4227D0FBF0B7").execute(callback);
+                } catch (Exception exception) {
+                    Log.e("ErrorAuthService", "Error Azure AuthService - " + exception.getMessage());
+                }
+                return null;
+            }
+        }.execute();
+    }
+
 }

@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.Legend;
@@ -71,6 +72,8 @@ public class MyActivity extends Activity {
         mChart.setValueTypeface(tf);
 
         Integer value = getLatestWaterDistance();
+
+        setCriticalLevel();
 
         setData(value);
 
@@ -154,6 +157,32 @@ public class MyActivity extends Activity {
         });
 
         return 200;
+    }
+
+    private void setCriticalLevel() {
+        WaterLevelService.getInstance(this).setCriticalLevel(new TableJsonQueryCallback() {
+            @Override
+            public void onCompleted(JsonElement jsonElement, int i, Exception e, ServiceFilterResponse serviceFilterResponse) {
+                try {
+                    if (e != null) {
+                        Log.e("ErrorActivity", "Error Azure Activity from WaterLevelService - " + e.getMessage());
+                        return;
+                    }
+
+                    JsonArray results = jsonElement.getAsJsonArray();
+
+                    for (JsonElement item : results){
+
+                        MyHandler._criticalWaterLevel = item.getAsJsonObject().getAsJsonPrimitive("criticallevel").getAsInt();
+
+                        Toast.makeText(mContext, MyHandler._criticalWaterLevel.toString(), Toast.LENGTH_LONG).show();
+                    }
+                }
+                catch (Exception exception) {
+                    Log.e("ErrorActivity", "Error Azure Activity in Activity - " + exception.getMessage());
+                }
+            }
+        });
     }
 
     public void updateViews(Integer latestWaterDistance) {
