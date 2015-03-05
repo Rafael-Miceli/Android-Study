@@ -16,11 +16,13 @@ import java.net.MalformedURLException;
  */
 public class WaterLevelService {
 
+    private MobileServiceJsonTable mClientsTable;
     private MobileServiceJsonTable mClientsTanksTable;
     private MobileServiceJsonTable mClientTableData;
-    private MobileServiceClient mClient;
+    private MobileServiceClient mMobileServiceClient;
     private Context mContext;
     private static WaterLevelService instance;
+    private String mClientName;
 
     public static WaterLevelService getInstance(Context context)
     {
@@ -34,9 +36,10 @@ public class WaterLevelService {
         mContext = context;
 
         try {
-            mClient = new MobileServiceClient("https://arduinoapp.azure-mobile.net/", "QkTMsFHSEaNGuiKVsywYYHpHnIHMUB64", mContext);
+            mMobileServiceClient = new MobileServiceClient("https://arduinoapp.azure-mobile.net/", "QkTMsFHSEaNGuiKVsywYYHpHnIHMUB64", mContext);
 
-            mClientsTanksTable = mClient.getTable("ClientsTanks");
+            mClientsTanksTable = mMobileServiceClient.getTable("ClientsTanks");
+            mClientsTable = mMobileServiceClient.getTable("Clients");
 
         } catch (MalformedURLException e) {
             Log.e("WaterLevelService", "There was an error creating the Mobile Service.  Verify the URL");
@@ -44,8 +47,14 @@ public class WaterLevelService {
     }
 
     public void setClientTableData(String clientTableDataName) {
-        mClientTableData = mClient.getTable(clientTableDataName);
+        mClientName = clientTableDataName;
+        mClientTableData = mMobileServiceClient.getTable(clientTableDataName);
     }
+
+    public void setTanksFromCloud(){
+
+    }
+
 
     public void getLatestLevelFromAzure(final TableJsonQueryCallback callback){
         new AsyncTask<Void, Void, Void>() {
