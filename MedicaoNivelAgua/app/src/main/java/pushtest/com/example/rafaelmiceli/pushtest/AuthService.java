@@ -40,9 +40,6 @@ import com.microsoft.windowsazure.mobileservices.TableJsonQueryCallback;
 import com.microsoft.windowsazure.mobileservices.UserAuthenticationCallback;
 import com.microsoft.windowsazure.notifications.NotificationsManager;
 
-/**
- * Created by Rafael on 12/02/2015.
- */
 public class AuthService {
 
     private NotificationService mNotificationService;
@@ -84,12 +81,6 @@ public class AuthService {
         return mClient.getCurrentUser().getUserId();
     }
 
-    /**
-     * Handles logging in with custom auth
-     * @param username
-     * @param password
-     * @param callback
-     */
     public void login(String username, String password, TableJsonOperationCallback callback) {
         JsonObject customUser = new JsonObject();
         customUser.addProperty("username", username);
@@ -101,10 +92,6 @@ public class AuthService {
         mTableAccounts.insert(customUser, parameters, callback);
     }
 
-    /**
-     * Checks to see if we have userId and token stored on the device and sets them if so
-     * @return
-     */
     public boolean isUserAuthenticated() {
         SharedPreferences settings = mContext.getSharedPreferences("UserData", 0);
         if (settings != null) {
@@ -118,12 +105,6 @@ public class AuthService {
         return false;
     }
 
-    /**
-     * Creates a nwe MobileServiceUser using a userId and token passed in.
-     * Also sets the current provider
-     * @param userId
-     * @param token
-     */
     public void setUserData(String userId, String token) {
         MobileServiceUser user = new MobileServiceUser(userId);
         user.setAuthenticationToken(token);
@@ -144,10 +125,6 @@ public class AuthService {
             mProvider = MobileServiceAuthenticationProvider.Google;
     }
 
-    /***
-     * Pulls the user ID and token out of a json object from the server
-     * @param jsonObject
-     */
     public void setUserAndSaveData(JsonObject jsonObject) {
         mNotificationService.registerWithNotificationHubs();
 
@@ -166,11 +143,6 @@ public class AuthService {
         saveUserData();
     }
 
-    /**
-     * Saves userId and token to SharedPreferences.
-     * NOTE:  This is not secure and is just used as a storage mechanism.  In reality, you would want to
-     * come up with a more secure way of storing this information.
-     */
     public void saveUserData() {
         SharedPreferences settings = mContext.getSharedPreferences("UserData", 0);
         SharedPreferences.Editor preferencesEditor = settings.edit();
@@ -179,14 +151,6 @@ public class AuthService {
         preferencesEditor.commit();
     }
 
-    /**
-     * Handles logging the user out including:
-     * -deleting cookies so their login with a provider won't be cached in the web view
-     * -removing the userdata from the shared preferences
-     * -setting the current user object on the client to logged out
-     * -optionally redirects to the login page if requested
-     * @param shouldRedirectToLogin
-     */
     public void logout(boolean shouldRedirectToLogin) {
         //Clear the cookies so they won't auto login to a provider again
         CookieSyncManager.createInstance(mContext);
