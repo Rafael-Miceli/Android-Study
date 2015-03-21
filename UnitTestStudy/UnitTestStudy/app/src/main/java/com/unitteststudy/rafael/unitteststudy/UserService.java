@@ -6,9 +6,17 @@ package com.unitteststudy.rafael.unitteststudy;
 public class UserService {
 
 
-    public User login(String username, String password) {
+    private UserCloudRepository userRepository;
 
-        return null;
+    public UserService(UserCloudRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public User login(String username, String password) {
+        
+        User user = userRepository.getByUsernameAndPassword(username, password);
+
+        return user;
     }
 
 }

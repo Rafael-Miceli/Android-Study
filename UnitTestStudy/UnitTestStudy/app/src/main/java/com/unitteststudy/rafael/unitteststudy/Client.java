@@ -5,4 +5,5 @@ package com.unitteststudy.rafael.unitteststudy;
  */
 public class Client {
 
+    public String Name;
 }
