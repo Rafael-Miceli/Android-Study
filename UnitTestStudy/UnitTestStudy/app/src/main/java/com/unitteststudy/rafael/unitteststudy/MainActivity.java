@@ -4,18 +4,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
+import javax.inject.Inject;
 
-import java.net.MalformedURLException;
-
-
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends BaseActionBarActivity {
 
     private Context context;
+
+    @Inject
+    UserService userService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,17 +23,8 @@ public class MainActivity extends ActionBarActivity {
 
         context = this;
 
-        try {
-            MobileServiceClient mobileServiceClient =  new MobileServiceClient("https://arduinoapp.azure-mobile.net/", "QkTMsFHSEaNGuiKVsywYYHpHnIHMUB64", this);
-            WrappedMobileServiceJsonTable wrappedMobileServiceJsonTable = new WrappedMobileServiceJsonTable(mobileServiceClient.getTable("accounts"));
-            AccountInsertCallbackHandler accountInsertCallbackHandler = new AccountInsertCallbackHandler(context, new Intent("Main"));
-            UserAzureRepository userAzureRepository = new UserAzureRepository(wrappedMobileServiceJsonTable, accountInsertCallbackHandler);
-            UserService userService = new UserService(userAzureRepository);
-            userService.login("rafael.miceli@hotmail.com", "12345678");
+        userService.login("rafael.miceli@hotmail.com", "12345678");
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
     }
 
     private void showInScreen(User user)
