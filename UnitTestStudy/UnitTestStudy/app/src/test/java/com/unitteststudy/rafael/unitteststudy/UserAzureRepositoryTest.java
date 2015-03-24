@@ -26,13 +26,22 @@ import static org.mockito.Mockito.mock;
 public class UserAzureRepositoryTest {
 
     @Test
-    public void test_Login_Callback() throws Exception {
+    public void test_Login_Callback_Return_The_ClientName_And_The_Tanks() throws Exception {
         String username = "rafael.miceli@hotmail.com";
         String password = "12345678";
         String expectedClient = "ClienteTeste1";
 
+        //Cisterna
+        Integer expectedTankLevel = 50;
+        String expectedTankName = "Cisterna";
+        Double expectedTankHeight = 7.00;
+        //Caixa d'agua
+        Integer expectedTankLevel2 = 20;
+        String expectedTankName2 = "Caixa d'agua";
+        Double expectedTankHeight2 = 4.00;
+
         final JsonObject customUser = new JsonObject();
-        customUser.addProperty("client",expectedClient);
+        customUser.addProperty("clientName",expectedClient);
 
         WrappedMobileServiceJsonTable mockedMobileServiceJsonTable = mock(WrappedMobileServiceJsonTable.class);
         Intent intent = mock(Intent.class);

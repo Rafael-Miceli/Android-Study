@@ -27,11 +27,10 @@ public class AccountInsertCallbackHandler implements TableJsonOperationCallback 
             return;
         else
         {
-            String clientName = jsonObject.getAsJsonPrimitive("client").getAsString();
+            String clientName = jsonObject.getAsJsonPrimitive("clientName").getAsString();
 
             User receivedUser = new User();
             Client client = new Client();
-
             client.Name = clientName;
             receivedUser.client = client;
 
