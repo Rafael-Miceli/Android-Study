@@ -6,4 +6,9 @@ package com.unitteststudy.rafael.unitteststudy;
 public class Client {
 
     public String Name;
+    private Tank[] tanks;
+
+    public Tank[] getTanks() {
+        return tanks;
+    }
 }

@@ -2,8 +2,8 @@ package com.unitteststudy.rafael.unitteststudy;
 
 import android.content.Context;
 import android.content.Intent;
-import android.test.mock.MockContext;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.microsoft.windowsazure.mobileservices.TableJsonOperationCallback;
 
@@ -25,23 +25,25 @@ import static org.mockito.Mockito.mock;
  */
 public class UserAzureRepositoryTest {
 
+    private Integer expectedTankCriticalLevel;
+    private String expectedTankName;
+    private Double expectedTankHeight;
+    private Integer expectedTankCriticalLevel2;
+    private String expectedTankName2;
+    private Double expectedTankHeight2;
+    private String expectedClient;
+
     @Test
     public void test_Login_Callback_Return_The_ClientName_And_The_Tanks() throws Exception {
         String username = "rafael.miceli@hotmail.com";
         String password = "12345678";
-        String expectedClient = "ClienteTeste1";
 
-        //Cisterna
-        Integer expectedTankLevel = 50;
-        String expectedTankName = "Cisterna";
-        Double expectedTankHeight = 7.00;
-        //Caixa d'agua
-        Integer expectedTankLevel2 = 20;
-        String expectedTankName2 = "Caixa d'agua";
-        Double expectedTankHeight2 = 4.00;
+        expectedDataToReturnAfterLogin();
 
         final JsonObject customUser = new JsonObject();
-        customUser.addProperty("clientName",expectedClient);
+        customUser.addProperty("clientName", expectedClient);
+
+
 
         WrappedMobileServiceJsonTable mockedMobileServiceJsonTable = mock(WrappedMobileServiceJsonTable.class);
         Intent intent = mock(Intent.class);
@@ -59,7 +61,29 @@ public class UserAzureRepositoryTest {
 
         sut.getByUsernameAndPassword(username, password);
 
-        assertThat(accountInsertCallbackHandler.user[0].client.Name, IsNull.notNullValue());
+        assertExpectedData(accountInsertCallbackHandler);
+
+
+    }
+
+    private void expectedDataToReturnAfterLogin() {
+        expectedClient = "ClienteTeste1";
+
+        //Cisterna
+        expectedTankCriticalLevel = 50;
+        expectedTankName = "Cisterna";
+        expectedTankHeight = 7.00;
+        //Caixa d'agua
+        expectedTankCriticalLevel2 = 20;
+        expectedTankName2 = "Caixa d'agua";
+        expectedTankHeight2 = 4.00;
+    }
+
+    private void assertExpectedData(AccountInsertCallbackHandler accountInsertCallbackHandler) {
+        assertThat(accountInsertCallbackHandler.user[0], IsNull.notNullValue());
         assertThat(accountInsertCallbackHandler.user[0].client.Name, IsEqual.equalTo(expectedClient));
+        assertThat(accountInsertCallbackHandler.user[0].client.getTanks()[0].getTankName(), IsEqual.equalTo(expectedTankName));
+        assertThat(accountInsertCallbackHandler.user[0].client.getTanks()[0].getTankHeight(), IsEqual.equalTo(expectedTankHeight));
+        assertThat(accountInsertCallbackHandler.user[0].client.getTanks()[0].getTankCriticalLevel(), IsEqual.equalTo(expectedTankCriticalLevel));
     }
 }
