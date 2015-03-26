@@ -3,6 +3,7 @@ package com.unitteststudy.rafael.unitteststudy;
 import android.content.Context;
 import android.content.Intent;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.microsoft.windowsazure.mobileservices.TableJsonOperationCallback;
@@ -17,8 +18,10 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by Rafael on 20/03/2015.
@@ -28,10 +31,8 @@ public class UserAzureRepositoryTest {
     private Integer expectedTankCriticalLevel;
     private String expectedTankName;
     private Double expectedTankHeight;
-    private Integer expectedTankCriticalLevel2;
-    private String expectedTankName2;
-    private Double expectedTankHeight2;
-    private String expectedClient;
+    private String expectedClientName;
+    private Client expectedClient;
 
     @Test
     public void test_Login_Callback_Return_The_ClientName_And_The_Tanks() throws Exception {
@@ -41,13 +42,12 @@ public class UserAzureRepositoryTest {
         expectedDataToReturnAfterLogin();
 
         final JsonObject customUser = new JsonObject();
-        customUser.addProperty("clientName", expectedClient);
-
-
+        customUser.add("Client", new JsonObject());
 
         WrappedMobileServiceJsonTable mockedMobileServiceJsonTable = mock(WrappedMobileServiceJsonTable.class);
         Intent intent = mock(Intent.class);
         Context context = mock(Context.class);
+        GsonWrapper gson = mock(GsonWrapper.class);
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
@@ -55,33 +55,41 @@ public class UserAzureRepositoryTest {
                 return null;
             }
         }).when(mockedMobileServiceJsonTable).insert(any(JsonObject.class), any(ArrayList.class), any(TableJsonOperationCallback.class));
-        AccountInsertCallbackHandler accountInsertCallbackHandler = new AccountInsertCallbackHandler(context, intent);
+
+        when(gson.fromJson(any(JsonElement.class), eq(Client.class))).thenReturn(expectedClient);
+
+        AccountInsertCallbackHandler accountInsertCallbackHandler = new AccountInsertCallbackHandler(context, intent, gson);
 
         UserAzureRepository sut = new UserAzureRepository(mockedMobileServiceJsonTable, accountInsertCallbackHandler);
 
         sut.getByUsernameAndPassword(username, password);
 
         assertExpectedData(accountInsertCallbackHandler);
-
-
     }
 
     private void expectedDataToReturnAfterLogin() {
-        expectedClient = "ClienteTeste1";
-
+        expectedClientName = "ClienteTeste1";
         //Cisterna
         expectedTankCriticalLevel = 50;
         expectedTankName = "Cisterna";
         expectedTankHeight = 7.00;
-        //Caixa d'agua
-        expectedTankCriticalLevel2 = 20;
-        expectedTankName2 = "Caixa d'agua";
-        expectedTankHeight2 = 4.00;
+
+        expectedClient = new Client();
+        expectedClient.setName(expectedClientName);
+
+        Tank tank = new Tank();
+        tank.setName(expectedTankName);
+        tank.setHeight(expectedTankHeight);
+        tank.setCriticalLevel(expectedTankCriticalLevel);
+
+        Tank[] expectedTanks = new Tank[]{tank};
+
+        expectedClient.setTanks(expectedTanks);
     }
 
     private void assertExpectedData(AccountInsertCallbackHandler accountInsertCallbackHandler) {
         assertThat(accountInsertCallbackHandler.user[0], IsNull.notNullValue());
-        assertThat(accountInsertCallbackHandler.user[0].client.Name, IsEqual.equalTo(expectedClient));
+        assertThat(accountInsertCallbackHandler.user[0].client.name, IsEqual.equalTo(expectedClientName));
         assertThat(accountInsertCallbackHandler.user[0].client.getTanks()[0].getTankName(), IsEqual.equalTo(expectedTankName));
         assertThat(accountInsertCallbackHandler.user[0].client.getTanks()[0].getTankHeight(), IsEqual.equalTo(expectedTankHeight));
         assertThat(accountInsertCallbackHandler.user[0].client.getTanks()[0].getTankCriticalLevel(), IsEqual.equalTo(expectedTankCriticalLevel));

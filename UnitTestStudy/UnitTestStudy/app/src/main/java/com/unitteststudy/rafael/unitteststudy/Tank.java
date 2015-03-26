@@ -20,4 +20,16 @@ public class Tank {
     public Integer getTankCriticalLevel() {
         return criticalLevel;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setHeight(Double height) {
+        this.height = height;
+    }
+
+    public void setCriticalLevel(Integer criticalLevel) {
+        this.criticalLevel = criticalLevel;
+    }
 }

@@ -3,6 +3,7 @@ package com.unitteststudy.rafael.unitteststudy;
 import android.content.Context;
 import android.content.Intent;
 
+import com.google.gson.Gson;
 import com.microsoft.windowsazure.mobileservices.MobileServiceClient;
 
 import java.net.MalformedURLException;
@@ -35,7 +36,7 @@ public class ApplicationModule {
         }
 
         WrappedMobileServiceJsonTable wrappedMobileServiceJsonTable = new WrappedMobileServiceJsonTable(mobileServiceClient.getTable("accounts"));
-        AccountInsertCallbackHandler accountInsertCallbackHandler = new AccountInsertCallbackHandler(context, new Intent("Main"));
+        AccountInsertCallbackHandler accountInsertCallbackHandler = new AccountInsertCallbackHandler(context, new Intent("Main"), new GsonWrapper());
 
         return new UserAzureRepository(wrappedMobileServiceJsonTable, accountInsertCallbackHandler);
     }

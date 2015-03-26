@@ -3,6 +3,7 @@ package com.unitteststudy.rafael.unitteststudy;
 import android.content.Context;
 import android.content.Intent;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.microsoft.windowsazure.mobileservices.ServiceFilterResponse;
 import com.microsoft.windowsazure.mobileservices.TableJsonOperationCallback;
@@ -15,10 +16,12 @@ public class AccountInsertCallbackHandler implements TableJsonOperationCallback 
     public final User[] user = {null};
     private Context context;
     private Intent intent;
+    private GsonWrapper gson;
 
-    public AccountInsertCallbackHandler(Context context, Intent intent) {
+    public AccountInsertCallbackHandler(Context context, Intent intent, GsonWrapper gson) {
         this.context = context;
         this.intent = intent;
+        this.gson = gson;
     }
 
     @Override
@@ -27,17 +30,12 @@ public class AccountInsertCallbackHandler implements TableJsonOperationCallback 
             return;
         else
         {
-            String clientName = jsonObject.getAsJsonPrimitive("clientName").getAsString();
+            Client client = gson.fromJson(jsonObject.get("Client"), Client.class);
 
             User receivedUser = new User();
-            Client client = new Client();
-            client.Name = clientName;
             receivedUser.client = client;
 
             user[0] = receivedUser;
-
-            intent.putExtra("clientName", clientName);
-            context.sendBroadcast(intent);
         }
     }
 }

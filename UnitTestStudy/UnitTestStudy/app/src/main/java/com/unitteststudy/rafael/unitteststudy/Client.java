@@ -5,10 +5,22 @@ package com.unitteststudy.rafael.unitteststudy;
  */
 public class Client {
 
-    public String Name;
+    public String name;
     private Tank[] tanks;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public Tank[] getTanks() {
         return tanks;
+    }
+
+    public void setTanks(Tank[] tanks) {
+        this.tanks = tanks;
     }
 }
