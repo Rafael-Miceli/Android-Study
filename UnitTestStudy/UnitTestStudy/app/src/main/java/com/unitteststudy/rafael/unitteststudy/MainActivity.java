@@ -23,7 +23,7 @@ public class MainActivity extends BaseActionBarActivity {
 
         context = this;
 
-        userService.login("rafael.miceli@hotmail.com", "12345678");
+        userService.login("mjr@mjr.com", "12345678");
     }
 
 
