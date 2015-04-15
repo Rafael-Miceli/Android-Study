@@ -26,5 +26,29 @@ public class MainActivity extends BaseActionBarActivity {
         userService.login("mjr@mjr.com", "12345678");
     }
 
+    private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            String clienName = intent.getStringExtra("clientName");
+
+            if (clienName != null)
+                Toast.makeText(context, clienName, Toast.LENGTH_LONG).show();
+            else
+                Toast.makeText(context, "Not registered", Toast.LENGTH_LONG).show();
+        }
+    };
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        context.registerReceiver(messageReceiver, new IntentFilter("Main"));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        context.unregisterReceiver(messageReceiver);
+    }
 
 }

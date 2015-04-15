@@ -5,31 +5,22 @@ package com.unitteststudy.rafael.unitteststudy;
  */
 public class Tank {
 
-    private String name;
-    private Double height;
-    private Integer criticalLevel;
+    private String Name;
+    private Integer CriticalLevel;
 
-    public String getTankName() {
-        return name;
+    public String getName() {
+        return Name;
     }
 
-    public Double getTankHeight() {
-        return height;
-    }
-
-    public Integer getTankCriticalLevel() {
-        return criticalLevel;
+    public Integer getCriticalLevel() {
+        return CriticalLevel;
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.Name = name;
     }
 
-    public void setHeight(Double height) {
-        this.height = height;
-    }
-
-    public void setCriticalLevel(Integer criticalLevel) {
-        this.criticalLevel = criticalLevel;
+    public void setCriticalLevel(Integer CriticalLevel) {
+        this.CriticalLevel = CriticalLevel;
     }
 }

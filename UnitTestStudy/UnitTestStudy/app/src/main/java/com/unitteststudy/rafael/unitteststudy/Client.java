@@ -1,12 +1,14 @@
 package com.unitteststudy.rafael.unitteststudy;
 
+import java.util.ArrayList;
+
 /**
  * Created by Rafael on 19/03/2015.
  */
 public class Client {
 
     public String name;
-    private Tank[] tanks;
+    private ArrayList<Tank> tanks;
 
     public String getName() {
         return name;
@@ -16,11 +18,11 @@ public class Client {
         this.name = name;
     }
 
-    public Tank[] getTanks() {
+    public ArrayList<Tank> getTanks() {
         return tanks;
     }
 
-    public void setTanks(Tank[] tanks) {
+    public void setTanks(ArrayList<Tank> tanks) {
         this.tanks = tanks;
     }
 }
