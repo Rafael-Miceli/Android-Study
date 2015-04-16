@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="service_hands_title">Mão</string>
+    <string name="service_handsandfeets_title">Pé e Mão</string>
+    <string name="service_french_title">Francesinha</string>
+    <string name="service_draw_title">Desenhos</string>
+	
+	<!-- Money preferences -->
+	<string name="service_hands_money_pref">hand_money</string>
+    <string name="service_handsandfeets_money_pref">handsandfeets_money</string>
+    <string name="service_french_money_pref">french_money</string>
+    <string name="service_draw_money_pref">draw_money</string>
+	
+	<!-- Time preferences -->
+	<string name="service_hands_time_pref">hand_time</string>
+    <string name="service_handsandfeets_time_pref">handsandfeets_time</string>
+    <string name="service_french_time_pref">french_time</string>
+    <string name="service_draw_time_pref">draw_time</string>
+	
+</resources>

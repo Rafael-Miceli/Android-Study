@@ -5,7 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import javax.inject.Inject;
 
@@ -15,6 +18,9 @@ public class MainActivity extends BaseActionBarActivity {
 
     @Inject
     UserService userService;
+
+    TankPageAdapter mTankPageAdapter;
+    ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,12 +36,12 @@ public class MainActivity extends BaseActionBarActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
 
-            String clienName = intent.getStringExtra("clientName");
+            ArrayList<Tank> tanks = intent.getParcelableArrayListExtra("tanks");
 
-            if (clienName != null)
-                Toast.makeText(context, clienName, Toast.LENGTH_LONG).show();
-            else
-                Toast.makeText(context, "Not registered", Toast.LENGTH_LONG).show();
+            mTankPageAdapter = new TankPageAdapter(getSupportFragmentManager(), context, tanks);
+
+            mViewPager = (ViewPager) findViewById(R.id.pager);
+            mViewPager.setAdapter(mTankPageAdapter);
         }
     };
 

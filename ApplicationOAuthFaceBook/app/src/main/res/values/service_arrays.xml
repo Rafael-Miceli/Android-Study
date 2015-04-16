@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="service_titles">
+        <item>@string/service_hands_title</item>
+        <item>@string/service_handsandfeets_title</item>
+        <item>@string/service_french_title</item>
+        <item>@string/service_draw_title</item>
+    </string-array>
+	
+	<string-array name="service_money_pref">
+        <item>@string/service_hands_money_pref</item>
+        <item>@string/service_handsandfeets_money_pref</item>
+        <item>@string/service_french_money_pref</item>
+        <item>@string/service_draw_money_pref</item>
+    </string-array>
+	
+	<string-array name="service_time_pref">
+        <item>@string/service_hands_time_pref</item>
+        <item>@string/service_handsandfeets_time_pref</item>
+        <item>@string/service_french_time_pref</item>
+        <item>@string/service_draw_time_pref</item>
+    </string-array>
+</resources>

@@ -37,7 +37,7 @@ public class AccountInsertCallbackHandler implements TableJsonOperationCallback 
 
             user[0] = receivedUser;
 
-            intent.putExtra("clientName", client.getName());
+            intent.putExtra("tanks", client.getTanks());
             context.sendBroadcast(intent);
         }
     }

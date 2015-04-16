@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="navigation_drawer_options">
+        <item>Agenda</item>
+        <item>Serviços</item>
+        <item>Meu Perfil</item>
+        <item>Logout</item>
+    </string-array>
+</resources>

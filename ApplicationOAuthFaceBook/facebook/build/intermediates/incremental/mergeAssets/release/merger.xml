@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merger version="2" >
+
+    <dataSet config="main" >
+        <source path="C:\Users\rafael.miceli\Documents\GitHub\Study-Code\AndroidProjectsStudy\ApplicationOAuthFaceBook\facebook\assets" />
+    </dataSet>
+    <dataSet config="release" >
+        <source path="C:\Users\rafael.miceli\Documents\GitHub\Study-Code\AndroidProjectsStudy\ApplicationOAuthFaceBook\facebook\build-types\release\assets" />
+    </dataSet>
+
+</merger>
