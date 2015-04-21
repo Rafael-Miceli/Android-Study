@@ -9,8 +9,8 @@ import android.os.Parcelable;
 public class Tank implements Parcelable {
 
     private String Name;
-    private Integer CriticalLevel;
-    private Integer Level;
+    private Integer CriticalLevel = 0;
+    private Integer Level = 0;
 
     public Tank(Parcel parcel) {
         Name = parcel.readString();
@@ -49,6 +49,11 @@ public class Tank implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        if (CriticalLevel == null)
+            CriticalLevel = 0;
+        if (Level == null)
+            Level = 0;
+
         dest.writeString(Name);
         dest.writeInt(CriticalLevel);
         dest.writeInt(Level);
