@@ -14,7 +14,7 @@ import android.widget.TextView;
 public class TankFragment extends Fragment {
 
     public final static String TANK_NAME = "Reservatorio";
-    public final static String TANK_VALUE = "0";
+    public final static String TANK_VALUE = "Valor";
     private String mTankName;
     private int mTankValue;
     private TextView mTankNameTextView;
@@ -49,8 +49,7 @@ public class TankFragment extends Fragment {
     }
 
     private void displayValues(final String tankName, int tankValue) {
-
         mTankNameTextView.setText(tankName);
-        mTankValueTextView.setText(tankValue);
+        mTankValueTextView.setText(String.valueOf(tankValue));
     }
 }
